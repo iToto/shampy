@@ -12,7 +12,7 @@ func main() {
     router := mux.NewRouter().StrictSlash(true)
     router.HandleFunc("/", Index)
     router.HandleFunc("/shampoo", ShampooIndex)
-    router.HandleFunc("/shampoo/{id}", ShampooShow)
+    router.HandleFunc("/shampoo/{id}", GetShampoo).Methods("GET")
     log.Fatal(http.ListenAndServe(":8080", router))
 }
 
@@ -24,7 +24,7 @@ func ShampooIndex(w http.ResponseWriter, r *http.Request) {
     fmt.Fprintln(w, "ShampooIndex")
 }
 
-func ShampooShow(w http.ResponseWriter, r *http.Request) {
+func GetShampoo(w http.ResponseWriter, r *http.Request) {
     vars := mux.Vars(r)
     shampooId := vars["id"]
 	fmt.Fprintln(w, "Shampoo show:", shampooId)
