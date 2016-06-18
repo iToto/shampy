@@ -6,23 +6,30 @@ import (
     "net/http"
     "encoding/json"
     "strconv"
+    "os"
 
     "github.com/gorilla/mux"
 )
 
 var shampoos = map[int]Shampoo{1: {"someBrand"}}
- 
+
 type Shampoo struct {
     Brand string
 }
 
 func main() {
+    port := os.Getenv("PORT")
+
+    if port == "" {
+      log.Fatal("$PORT environment variable must be set")
+    }
     router := mux.NewRouter().StrictSlash(true)
+
     router.HandleFunc("/", Index)
     router.HandleFunc("/shampoo", ShampooIndex)
     router.HandleFunc("/shampoo/{id}", GetShampoo).Methods("GET")
     router.HandleFunc("/shampoo/{id}", PostShampoo).Methods("POST")
-    log.Fatal(http.ListenAndServe(":8080", router))
+    log.Fatal(http.ListenAndServe(":" + port, router))
 }
 
 func Index(w http.ResponseWriter, r *http.Request) {
