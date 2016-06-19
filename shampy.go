@@ -13,21 +13,15 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var db *sql.DB
+
 var shampoos = map[int]Shampoo{1: {"someBrand"}}
 
 type Shampoo struct {
 	Brand string
 }
 
-func main() {
-	port := os.Getenv("PORT")
-
-	if port == "" {
-		log.Fatal("$PORT environment variable must be set")
-	} else {
-		fmt.Println("Running on port: " + port)
-	}
-
+func DBConnection() *sql.DB {
 	dbURL := os.Getenv("DATABASE_URL")
 
 	if dbURL == "" {
@@ -42,6 +36,19 @@ func main() {
 		log.Fatal(err)
 	}
 
+	return db
+}
+
+func main() {
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		log.Fatal("$PORT environment variable must be set")
+	} else {
+		fmt.Println("Running on port: " + port)
+	}
+
+	db = DBConnection()
 	router := mux.NewRouter().StrictSlash(true)
 
 	router.HandleFunc("/", Index)
@@ -65,7 +72,16 @@ func GetShampoo(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	shampooId, _ := strconv.ParseInt(vars["id"], 10, 0)
 
-	fmt.Fprintln(w, "Shampoo show:", shampoos[int(shampooId)])
+	var brand string
+
+	err := db.QueryRow("SELECT brand FROM shampoo WHERE id = $1", shampooId).Scan(&brand)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// fmt.Print("Brand: ", brand)
+	fmt.Fprintln(w, "Shampoo show:", brand)
 }
 
 func PostShampoo(w http.ResponseWriter, r *http.Request) {
