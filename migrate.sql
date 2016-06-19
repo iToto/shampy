@@ -1,9 +1,13 @@
 /* SQLEditor (Postgres)*/
 
+DROP TABLE IF EXISTS user_shampoo;
+DROP TABLE IF EXISTS public.user;
+DROP TABLE IF EXISTS shampoo;
+
 CREATE TABLE shampoo
 (
 id SERIAL NOT NULL UNIQUE ,
-name VARCHAR(255) UNIQUE ,
+brand VARCHAR(255) UNIQUE ,
 created_on TIMESTAMP,
 updated_on TIMESTAMP,
 deleted_on TIMESTAMP,
@@ -31,7 +35,7 @@ user_id BIGSERIAL,
 PRIMARY KEY (id)
 );
 
-CREATE INDEX shampoo_name_idx ON shampoo(name);
+CREATE INDEX shampoo_name_idx ON shampoo(brand);
 
 CREATE INDEX user_email_idx ON "user"(email);
 
