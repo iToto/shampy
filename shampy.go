@@ -1,8 +1,10 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
+	_ "github.com/lib/pq"
 	"log"
 	"net/http"
 	"os"
@@ -22,7 +24,24 @@ func main() {
 
 	if port == "" {
 		log.Fatal("$PORT environment variable must be set")
+	} else {
+		fmt.Println("Running on port: " + port)
 	}
+
+	dbURL := os.Getenv("DATABASE_URL")
+
+	if dbURL == "" {
+		log.Fatal("$DATABASE_URL environment variable must be set")
+	} else {
+		fmt.Println("Connected to database: " + dbURL)
+	}
+
+	db, err := sql.Open("postgres", dbURL)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	router := mux.NewRouter().StrictSlash(true)
 
 	router.HandleFunc("/", Index)
